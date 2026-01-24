@@ -20,5 +20,7 @@ Once the nodes are up, configure kubectl and deploy apps and services
 
 Check if ebs-csi-driver are installed. Need to create pv for apps like postgres (sts)
 
-deploy aws-load-balancer-controller
+deploy aws-load-balancer-controller, you would need an Pod identity IAM role for it to work. Need to do pod association
+
+Create Ingress resource. Then controller will detect it and create ALB and target groups per service in ingress
 
