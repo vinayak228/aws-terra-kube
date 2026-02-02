@@ -26,8 +26,9 @@ module "nodegroup" {
   cluster_name       = module.eks.cluster_name
   private_subnet_ids = module.vpc.private_subnet_ids
 
-  desired_size = 2
+  desired_size = 1
   min_size = 1
   max_size = 2
+  instance_types = ["t3.medium"]
 }
 
