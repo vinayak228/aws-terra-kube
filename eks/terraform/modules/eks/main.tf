@@ -15,6 +15,30 @@ resource "aws_iam_role" "eks_cluster_role" {
   })
 }
 
+resource "kubernetes_config_map" "aws_auth" {
+  metadata {
+    name      = "aws-auth"
+    namespace = "kube-system"
+  }
+
+  data = {
+    mapUsers = <<-YAML
+      - userarn: arn:aws:iam::950288991103:user/vinayak-admin
+        username: vinayak-admin
+        groups:
+          - developers
+    YAML
+
+    mapRoles = <<-YAML
+      - rolearn: arn:aws:iam::950288991103:role/github-role
+        username: github-actions
+        groups:
+          - system:masters
+    YAML
+  }
+}
+
+
 resource "aws_iam_role_policy_attachment" "cluster_policy" {
   role       = aws_iam_role.eks_cluster_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
