@@ -15,6 +15,8 @@ jobs:
   terraform:
     name: Terraform Apply
     runs-on: ubuntu-latest
+    environment:
+      name: manual
 
     steps:
       - name: Checkout repository
@@ -43,7 +45,40 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform plan -out=tfplan
 
-#      - name: Terraform Apply
-#        working-directory: ${{ env.TF_WORKING_DIR }}
-#        run: terraform apply -auto-approve tfplan
+      - name: Terraform Apply
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform apply -auto-approve tfplan
 
+  terraform_deprov:
+    name: Terraform Deprovision
+    runs-on: ubuntu-latest
+    needs: terraform
+    environment:
+      name: manual
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::950288991103:role/github-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init
+
+      - name: Terraform Validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform validate
+
+      - name: Terraform Apply
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform destroy -auto-approve tfplan
