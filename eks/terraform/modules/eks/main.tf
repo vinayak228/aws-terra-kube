@@ -15,7 +15,7 @@ resource "aws_iam_role" "eks_cluster_role" {
   })
 }
 
-resource "kubernetes_config_map" "aws_auth" {
+resource "kubernetes_config_map_v1" "aws_auth" {
   metadata {
     name      = "aws-auth"
     namespace = "kube-system"
@@ -26,7 +26,7 @@ resource "kubernetes_config_map" "aws_auth" {
       - userarn: arn:aws:iam::950288991103:user/vinayak-admin
         username: vinayak-admin
         groups:
-          - developers
+          - eks-admins
     YAML
 
     mapRoles = <<-YAML
@@ -37,7 +37,6 @@ resource "kubernetes_config_map" "aws_auth" {
     YAML
   }
 }
-
 
 resource "aws_iam_role_policy_attachment" "cluster_policy" {
   role       = aws_iam_role.eks_cluster_role.name
